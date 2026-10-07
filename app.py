@@ -13,31 +13,49 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS для темної теми та насичено-жовтих заголовків (#FFD700)
+# Custom CSS
 st.markdown(
     """
     <style>
-    /* Фіксуємо темний фон для всього застосунку */
+    /* 1. Приховуємо службові іконки зверху праворуч та футер */
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    .stAppHeader {display: none;}
+
+    /* 2. Фіксуємо темний фон */
     .stApp, [data-testid="stSidebar"] {
         background-color: #0E1117 !important;
         color: #FAFAFA !important;
     }
     
-    /* Усі заголовки h1, h2, h3, h4, h5, h6 робимо насичено-жовтими */
+    /* 3. Усі заголовки та підзаголовки робимо насичено-жовтими (#FFD700) */
     h1, h2, h3, h4, h5, h6, 
     .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
+    [data-testid="stMetricLabel"] p {
         color: #FFD700 !important;
-        font-weight: bold;
+        font-weight: bold !important;
     }
     
-    /* Стилізація заголовків всередині expander */
-    .streamlit-expanderHeader p {
+    /* Заголовки всередині expander */
+    .streamlit-expanderHeader, .streamlit-expanderHeader p {
         color: #FFD700 !important;
-        font-weight: bold;
+        font-weight: bold !important;
     }
 
-    /* Гарантуємо чіткий текст для лейблів, підписів та звичайного тексту на смартфонах */
+    /* 4. Чіткість іконки/кнопки розгортання бічної панелі на смартфоні */
+    [data-testid="stSidebarCollapseButton"] button, 
+    [data-testid="stSidebarCollapsedControl"] button,
+    button[aria-label="Open sidebar"],
+    button[aria-label="Close sidebar"] {
+        color: #FFD700 !important;
+        background-color: #262730 !important;
+        border: 1px solid #FFD700 !important;
+        border-radius: 5px !important;
+    }
+
+    /* Текст для всіх елементів */
     label, p, span, div, .stMarkdown {
         color: #FAFAFA !important;
     }
