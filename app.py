@@ -13,61 +13,64 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS для темного фону, білих заголовків та ЖОВТОЇ КНОПКИ бічної панелі
+# Custom CSS
 st.markdown(
     """
     <style>
-    /* Приховуємо лише верхнє меню Streamlit та футер */
-    #MainMenu {visibility: hidden !important;}
-    footer {visibility: hidden !important;}
-    
-    /* Фіксуємо темну тему для додатка */
+    /* 1. Повністю приховуємо верхню службову панель, іконки Fork, Share, Меню */
+    [data-testid="stHeader"] {
+        display: none !important;
+    }
+    #MainMenu, footer, header {
+        visibility: hidden !important;
+        height: 0px !important;
+    }
+
+    /* 2. Фіксуємо темну тему та БІЛИЙ колір для всіх заголовків і тексту */
     .stApp, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
         background-color: #0E1117 !important;
-        color: #FAFAFA !important;
+        color: #FFFFFF !important;
     }
 
-    /* Заголовки залишаємо білими */
-    h1, h2, h3, h4, h5, h6, 
+    h1, h2, h3, h4, h5, h6,
     .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-        color: #FAFAFA !important;
-        font-weight: bold !important;
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
+    label, p, span, div, .stMarkdown {
+        color: #FFFFFF !important;
     }
 
-    /* ЖОВТИЙ КВАДРАТ ДЛЯ КНОПКИ РОЗГОРТАННЯ / ЗГОРТАННЯ ПАНЕЛІ */
-    [data-testid="stSidebarCollapseButton"] button,
-    [data-testid="stSidebarCollapsedControl"] button,
+    /* 3. Відновлюємо вертикальну розділювальну лінію бічної панелі на ПК */
+    [data-testid="stSidebar"] {
+        border-right: 1px solid #30363D !important;
+    }
+
+    /* 4. ЧІТКА ВІДИМА КНОПКА ВІДКРИВАННЯ ПАНЕЛІ (для смартфона та ПК) */
+    /* Фіксуємо її у верхньому лівому кутку, щоб вона ніколи не зникала */
+    [data-testid="stSidebarCollapsedControl"],
     button[aria-label="Open sidebar"],
-    button[aria-label="Close sidebar"],
-    button[data-testid="baseButton-header"] {
-        background-color: #FFD700 !important;
-        border: 2px solid #FFD700 !important;
-        border-radius: 8px !important;
-        opacity: 1 !important;
-        visibility: visible !important;
+    button[aria-label="Close sidebar"] {
+        position: fixed !important;
+        top: 10px !important;
+        left: 10px !important;
+        z-index: 999999 !important;
         display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0px 2px 6px rgba(0,0,0,0.6) !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background-color: #FFFFFF !important;
+        border: 1px solid #CCCCCC !important;
+        border-radius: 6px !important;
+        padding: 4px !important;
+        box-shadow: 0px 2px 8px rgba(0,0,0,0.5) !important;
     }
 
-    /* Чорна іконка всередині жовтого квадрата */
-    [data-testid="stSidebarCollapseButton"] svg,
+    /* Іконка всередині кнопки (темна для контрасту на білому фоні) */
     [data-testid="stSidebarCollapsedControl"] svg,
     button[aria-label="Open sidebar"] svg,
-    button[aria-label="Close sidebar"] svg,
-    button[data-testid="baseButton-header"] svg {
-        color: #000000 !important;
-        fill: #000000 !important;
-        stroke: #000000 !important;
-        width: 22px !important;
-        height: 22px !important;
-    }
-
-    /* Текст для всіх елементів */
-    label, p, span, div, .stMarkdown {
-        color: #FAFAFA !important;
+    button[aria-label="Close sidebar"] svg {
+        color: #0E1117 !important;
+        fill: #0E1117 !important;
+        width: 24px !important;
+        height: 24px !important;
     }
     </style>
 """,
