@@ -13,51 +13,69 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS
+# ПРИМУСОВИЙ CSS-СТИЛЬ DLA ЖОВТИХ ЗАГОЛОВКІВ ТА ФІКСАЦІЇ КНОПКИ СІДЕБАРА
 st.markdown(
     """
     <style>
-    /* 1. Приховуємо службові іконки зверху праворуч та футер */
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stAppHeader {display: none;}
+    /* 1. Приховуємо лише верхні службові меню Streamlit (Deploy, три крапки), залишаючи кнопку панелі */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+    }
 
-    /* 2. Фіксуємо темний фон */
-    .stApp, [data-testid="stSidebar"] {
+    /* 2. Фіксуємо темну тему для всього додатка */
+    .stApp, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
         background-color: #0E1117 !important;
         color: #FAFAFA !important;
     }
     
-    /* 3. Усі заголовки та підзаголовки робимо насичено-жовтими (#FFD700) */
-    h1, h2, h3, h4, h5, h6, 
+    /* 3. НАЙПРИОРИТЕТНІШИЙ ЖОВТИЙ КОЛІР ДЛЯ ВСІХ ЗАГОЛОВКІВ (#FFD700) */
+    h1, h2, h3, h4, h5, h6,
     .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
-    [data-testid="stMetricLabel"] p {
+    [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stMarkdownContainer"] h3,
+    [data-testid="stMarkdownContainer"] h4,
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3,
+    [data-testid="stMetricLabel"] *,
+    .streamlit-expanderHeader * {
         color: #FFD700 !important;
-        font-weight: bold !important;
-    }
-    
-    /* Заголовки всередині expander */
-    .streamlit-expanderHeader, .streamlit-expanderHeader p {
-        color: #FFD700 !important;
-        font-weight: bold !important;
+        fill: #FFD700 !important;
+        font-weight: 800 !important;
     }
 
-    /* 4. Чіткість іконки/кнопки розгортання бічної панелі на смартфоні */
-    [data-testid="stSidebarCollapseButton"] button, 
-    [data-testid="stSidebarCollapsedControl"] button,
+    /* 4. ВІДНОВЛЕННЯ ТА ЯСКРАВІСТЬ КНОПКИ ПАНЕЛІ (ПК ТА СМАРТФОН) */
+    /* Гарантуємо, що кнопка розгортання/згортання завжди видно і вона яскравіша */
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="stSidebarCollapsedControl"],
     button[aria-label="Open sidebar"],
-    button[aria-label="Close sidebar"] {
-        color: #FFD700 !important;
-        background-color: #262730 !important;
-        border: 1px solid #FFD700 !important;
-        border-radius: 5px !important;
+    button[aria-label="Close sidebar"],
+    button[data-testid="baseButton-header"] {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background-color: #FFD700 !important;
+        color: #000000 !important;
+        border-radius: 6px !important;
+        border: 2px solid #FFD700 !important;
+        z-index: 999999 !important;
     }
 
-    /* Текст для всіх елементів */
-    label, p, span, div, .stMarkdown {
-        color: #FAFAFA !important;
+    /* Колір іконки всередині кнопки панелі */
+    [data-testid="stSidebarCollapseButton"] svg,
+    [data-testid="stSidebarCollapsedControl"] svg,
+    button[aria-label="Open sidebar"] svg,
+    button[aria-label="Close sidebar"] svg {
+        color: #000000 !important;
+        fill: #000000 !important;
+    }
+
+    /* Чіткість звичайного тексту та списків на мобільних пристроях */
+    p, span, label, div {
+        color: #FAFAFA;
     }
     </style>
 """,
@@ -260,7 +278,7 @@ with col_chart:
     ax.set_xlim(0, max(values + [5]) + 2)
     ax.tick_params(axis="both", labelsize=7)
 
-    # Додавання значень на бари
+    # Додавання значений на бари
     for bar in bars:
         width = bar.get_width()
         ax.text(
