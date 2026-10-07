@@ -22,9 +22,9 @@ st.markdown("""
 # ==========================================
 # БІЧНА ПАНЕЛЬ: НАЛАШТУВАННЯ НОРМАТИВІВ
 # ==========================================
-st.sidebar.header("1. МОЖЛИВОСТІ ВІДДІЛЕННЯ РХ РОЗВІДКИ НА АВТОМОБІЛІ")
+st.sidebar.header("МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБЗ")
 
-with st.sidebar.expander("РХ розвідка маршруту (1 СМРХР)", expanded=False):
+with st.sidebar.expander("Можливості відділення РХ розвідки (1 СМРХР)", expanded=False):
     rhr_speed_route = st.number_input(
         "РХ розвідка маршруту (км/год)",
         min_value=1.0,
@@ -40,18 +40,17 @@ with st.sidebar.expander("РХ розвідка маршруту (1 СМРХР)"
         step=0.5,
     )
 
-with st.sidebar.expander("2. МОЖЛИВОСТІ САНІТАРНОЇ ОБРОБКИ", expanded=False):
+with st.sidebar.expander("Можливості відділення санітарної обробки", expanded=False):
     san_capacity_per_unit = st.number_input(
-        "Можливості 1 відділення сан. обробки (люд/год)",
+        "Санітарна обробка людей (люд/год)",
         min_value=5,
         max_value=200,
         value=40,
         step=5,
-        help="Зазвичай для ДДА-66 / АРС з душевими насадками",
-    )
+   )
 
 with st.sidebar.expander(
-    "🚛 3. Нормативи спец. обробки техніки", expanded=False
+    "спец. обробки техніки", expanded=False
 ):
     decontam_light_time = st.number_input(
         "Обробка автомобільної/легкої техніки (хв/од)",
