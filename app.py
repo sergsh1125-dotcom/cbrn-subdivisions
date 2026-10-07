@@ -13,10 +13,16 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS для насичено-жовтих заголовків (стиль платформи ХБРЯ / CBRN)
+# Custom CSS для темної теми та насичено-жовтих заголовків (#FFD700)
 st.markdown(
     """
     <style>
+    /* Фіксуємо темний фон для всього застосунку */
+    .stApp, [data-testid="stSidebar"] {
+        background-color: #0E1117 !important;
+        color: #FAFAFA !important;
+    }
+    
     /* Усі заголовки h1, h2, h3, h4, h5, h6 робимо насичено-жовтими */
     h1, h2, h3, h4, h5, h6, 
     .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
@@ -24,10 +30,16 @@ st.markdown(
         color: #FFD700 !important;
         font-weight: bold;
     }
+    
     /* Стилізація заголовків всередині expander */
     .streamlit-expanderHeader p {
         color: #FFD700 !important;
         font-weight: bold;
+    }
+
+    /* Гарантуємо чіткий текст для лейблів, підписів та звичайного тексту на смартфонах */
+    label, p, span, div, .stMarkdown {
+        color: #FAFAFA !important;
     }
     </style>
 """,
@@ -224,7 +236,6 @@ with col_chart:
     ]
     values = [rhr_units_required, san_units_required, decontam_units_required]
 
-    # Зменшено розмір графіка у 2 рази (figsize=(3.5, 2.0))
     fig, ax = plt.subplots(figsize=(3.5, 2.0))
     bars = ax.barh(categories, values, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
     ax.set_xlabel("Кількість (відділень)", fontsize=8)
@@ -261,7 +272,12 @@ with col_summary:
             f"{personnel_count} осіб",
             f"{light_vehicles} легкових, {heavy_vehicles} вантажних",
         ],
-        "Нормативна спроможність на 1 од.": [
+        "Термін виконання": [
+            f"{time_limit} год",
+            f"{time_limit} год",
+            f"{time_limit} год",
+        ],
+        "Можливості 1 відділення": [
             (
                 f"{rhr_speed_route} км/год"
                 if rhr_type == "Маршрут (км)"
@@ -280,7 +296,7 @@ with col_summary:
     df_report = pd.DataFrame(report_data)
     st.dataframe(df_report, hide_index=True, use_container_width=True)
 
-    # Експорт у CSV (без трудомісткості, з оновленою назвою колонки та без "од.")
+    # Експорт у CSV
     csv_buffer = io.StringIO()
     df_report.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
 
