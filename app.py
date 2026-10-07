@@ -13,6 +13,27 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Custom CSS для насичено-жовтих заголовків (стиль платформи ХБРЯ / CBRN)
+st.markdown(
+    """
+    <style>
+    /* Усі заголовки h1, h2, h3, h4, h5, h6 робимо насичено-жовтими */
+    h1, h2, h3, h4, h5, h6, 
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+        color: #FFD700 !important;
+        font-weight: bold;
+    }
+    /* Стилізація заголовків всередині expander */
+    .streamlit-expanderHeader p {
+        color: #FFD700 !important;
+        font-weight: bold;
+    }
+    </style>
+""",
+    unsafe_allow_html=True,
+)
+
 st.title("Розрахунок сил та засобів РХБЗ")
 st.markdown("""
 Цей застосунок призначений для оперативної оцінки необхідної кількості підрозділів радіаційної та хімічної розвідки (РХР), 
@@ -24,7 +45,9 @@ st.markdown("""
 # ==========================================
 st.sidebar.header("МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБ ЗАХИСТУ")
 
-with st.sidebar.expander("Можливості відділення РХ розвідки (1 СМРХР):", expanded=False):
+with st.sidebar.expander(
+    "Можливості відділення РХ розвідки (1 СМРХР):", expanded=False
+):
     rhr_speed_route = st.number_input(
         "РХ розвідка маршруту (км/год)",
         min_value=1.0,
@@ -40,14 +63,17 @@ with st.sidebar.expander("Можливості відділення РХ роз�
         step=0.5,
     )
 
-with st.sidebar.expander("Можливості відділення санітарної обробки (1 комплект для сан. обробки)", expanded=False):
+with st.sidebar.expander(
+    "Можливості відділення санітарної обробки (1 комплект для сан. обробки)",
+    expanded=False,
+):
     san_capacity_per_unit = st.number_input(
         "Санітарна обробка людей (люд/год)",
         min_value=5,
         max_value=200,
         value=40,
         step=5,
-   )
+    )
 
 with st.sidebar.expander(
     "Можливості відділення спец. обробки техніки (1 СМРХЗ)", expanded=False
@@ -76,7 +102,7 @@ st.subheader("Вихідні дані для розрахунку")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.markdown("Радіаційна та хімічна розвідка")
+    st.markdown("### Радіаційна та хімічна розвідка")
     rhr_type = st.radio(
         "Об'єкти розвідки:", ["Маршрут (км)", "Район / Площа (км²)"]
     )
@@ -93,7 +119,7 @@ with col1:
         )
 
 with col2:
-    st.markdown("Санітарна обробка людей")
+    st.markdown("### Санітарна обробка людей")
     personnel_count = st.number_input(
         "Кількість людей",
         min_value=0,
@@ -102,9 +128,9 @@ with col2:
     )
 
 with col3:
-    st.markdown("Спеціальна обробка техніки")
+    st.markdown("### Спеціальна обробка техніки")
     light_vehicles = st.number_input(
-        " Легкові автомобілі (од)",
+        "Легкові автомобілі (од)",
         min_value=0,
         value=15,
         step=1,
@@ -157,14 +183,14 @@ decontam_units_required = math.ceil(total_decontam_hours / time_limit)
 # ==========================================
 # ВІДОБРАЖЕННЯ РЕЗУЛЬТАТІВ
 # ==========================================
-st.markdown("Результати розрахунку необхідних сил і засобів РХБ захисту")
+st.subheader("Результати розрахунку необхідних сил і засобів РХБ захисту")
 
 m_col1, m_col2, m_col3 = st.columns(3)
 
 with m_col1:
     st.metric(
         label="Відділень РХР",
-        value=f"{rhr_units_required} од.",
+        value=f"{rhr_units_required}",
         delta=f"Обсяг: {rhr_val} "
         + ("км" if rhr_type == "Маршрут (км)" else "км²"),
     )
@@ -172,36 +198,38 @@ with m_col1:
 with m_col2:
     st.metric(
         label="Відділень сан. обробки",
-        value=f"{san_units_required} од.",
+        value=f"{san_units_required}",
         delta=f"людей: {personnel_count}",
     )
 
 with m_col3:
     st.metric(
         label="Відділень спец. обробки",
-        value=f"{decontam_units_required} од.",
+        value=f"{decontam_units_required}",
         delta=f"Всього техніки: {light_vehicles + heavy_vehicles} од.",
     )
 
 st.markdown("---")
 
 # Візуалізація результатів
-col_chart, col_summary = st.columns([1.2, 1])
+col_chart, col_summary = st.columns([1, 1.2])
 
 with col_chart:
-    st.markdown("Необхідна кількість підрозділів")
+    st.subheader("Необхідна кількість підрозділів")
 
     categories = [
         "Відділення РХР",
         "Відділення сан. обробки",
-        "Відділення спец. обробки техніки",
+        "Відділення спец. обробки",
     ]
     values = [rhr_units_required, san_units_required, decontam_units_required]
 
-    fig, ax = plt.subplots(figsize=(6, 3.5))
+    # Зменшено розмір графіка у 2 рази (figsize=(3.5, 2.0))
+    fig, ax = plt.subplots(figsize=(3.5, 2.0))
     bars = ax.barh(categories, values, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
-    ax.set_xlabel("Кількість підрозділів / відділень (од)")
+    ax.set_xlabel("Кількість (відділень)", fontsize=8)
     ax.set_xlim(0, max(values + [5]) + 2)
+    ax.tick_params(axis="both", labelsize=7)
 
     # Додавання значень на бари
     for bar in bars:
@@ -213,13 +241,14 @@ with col_chart:
             ha="left",
             va="center",
             fontweight="bold",
+            fontsize=8,
         )
 
     plt.tight_layout()
     st.pyplot(fig)
 
 with col_summary:
-    st.markdown("Деталізація та звіт")
+    st.subheader("Деталізація та звіт")
 
     report_data = {
         "Категорія": [
@@ -239,24 +268,19 @@ with col_summary:
                 else f"{rhr_speed_area} км²/год"
             ),
             f"{san_capacity_per_unit} осіб/год",
-            f"{decontam_light_time} год/ {decontam_heavy_time} год",
+            f"{decontam_light_time} од/год / {decontam_heavy_time} од/год",
         ],
-        "Загальна трудомісткість": [
-            f"{rhr_val / (rhr_speed_route if rhr_type == 'Маршрут (км)' else rhr_speed_area):.1f} маш.-год",
-            f"{personnel_count / san_capacity_per_unit:.1f} маш.-год",
-            f"{total_decontam_hours:.1f} маш.-год",
-        ],
-        "Необхідна кількість": [
-            f"{rhr_units_required} од.",
-            f"{san_units_required} од.",
-            f"{decontam_units_required} од.",
+        "Необхідна кількість відділень": [
+            f"{rhr_units_required}",
+            f"{san_units_required}",
+            f"{decontam_units_required}",
         ],
     }
 
     df_report = pd.DataFrame(report_data)
     st.dataframe(df_report, hide_index=True, use_container_width=True)
 
-    # Експорт у CSV
+    # Експорт у CSV (без трудомісткості, з оновленою назвою колонки та без "од.")
     csv_buffer = io.StringIO()
     df_report.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
 
