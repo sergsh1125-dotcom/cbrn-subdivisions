@@ -7,7 +7,7 @@ import streamlit as st
 
 # Налаштування сторінки
 st.set_page_config(
-    page_title="Розрахунок сил та засобів РХБЗ",
+    page_title="Розрахунок сил та засобів РХБ захисту",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -22,9 +22,9 @@ st.markdown("""
 # ==========================================
 # БІЧНА ПАНЕЛЬ: НАЛАШТУВАННЯ НОРМАТИВІВ
 # ==========================================
-st.sidebar.header("МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБЗ")
+st.sidebar.header("МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБ ЗАХИСТУ")
 
-with st.sidebar.expander("Можливості відділення РХ розвідки (1 СМРХР)", expanded=False):
+with st.sidebar.expander("Можливості відділення РХ розвідки (1 СМРХР):", expanded=False):
     rhr_speed_route = st.number_input(
         "РХ розвідка маршруту (км/год)",
         min_value=1.0,
@@ -40,7 +40,7 @@ with st.sidebar.expander("Можливості відділення РХ роз�
         step=0.5,
     )
 
-with st.sidebar.expander("Можливості відділення санітарної обробки", expanded=False):
+with st.sidebar.expander("Можливості відділення санітарної обробки (1 комплект для сан. обробки)", expanded=False):
     san_capacity_per_unit = st.number_input(
         "Санітарна обробка людей (люд/год)",
         min_value=5,
@@ -50,17 +50,17 @@ with st.sidebar.expander("Можливості відділення саніта
    )
 
 with st.sidebar.expander(
-    "спец. обробки техніки", expanded=False
+    "Можливості відділення спец. обробки техніки (1 СМРХЗ)", expanded=False
 ):
     decontam_light_time = st.number_input(
-        "Обробка автомобільної/легкої техніки (хв/од)",
+        "Обробка легкових автомобілів (од/год)",
         min_value=5,
         max_value=120,
         value=20,
         step=5,
     )
     decontam_heavy_time = st.number_input(
-        "Обробка важкої/бронетанкової техніки (хв/од)",
+        "Обробка вантажших та спец. автомобілів (од/год)",
         min_value=10,
         max_value=180,
         value=40,
@@ -71,14 +71,14 @@ with st.sidebar.expander(
 # ==========================================
 # ОСНОВНА ПАНЕЛЬ: ВХІДНІ ДАНІ ДЛЯ ЗАВДАННЯ
 # ==========================================
-st.subheader("📋 Вихідні дані для розрахунку")
+st.subheader("Вихідні дані для розрахунку")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.markdown("##### 📍 Радіаційна та хімічна розвідка")
+    st.markdown("Радіаційна та хімічна розвідка")
     rhr_type = st.radio(
-        "Тип об'єкта розвідки:", ["Маршрут (км)", "Район / Площа (км²)"]
+        "Об'єкти розвідки:", ["Маршрут (км)", "Район / Площа (км²)"]
     )
     if rhr_type == "Маршрут (км)":
         rhr_val = st.number_input(
@@ -93,24 +93,24 @@ with col1:
         )
 
 with col2:
-    st.markdown("##### 👤 Санітарна обробка")
+    st.markdown("Санітарна обробка людей")
     personnel_count = st.number_input(
-        "Кількість особового складу (чел)",
+        "Кількість людей",
         min_value=0,
         value=250,
         step=10,
     )
 
 with col3:
-    st.markdown("##### 🚜 Спеціальна обробка техніки")
+    st.markdown("Спеціальна обробка техніки")
     light_vehicles = st.number_input(
-        "Автомобільна / легка техніка (од)",
+        " Легкові автомобілі (од)",
         min_value=0,
         value=15,
         step=1,
     )
     heavy_vehicles = st.number_input(
-        "Бронетанкова / важка техніка (од)",
+        "Вантажні та спец. автомобілі (од)",
         min_value=0,
         value=8,
         step=1,
@@ -118,7 +118,7 @@ with col3:
 
 st.markdown("---")
 time_limit = st.slider(
-    "⏱️ Відведений час на виконання всіх заходів (годин)",
+    "Термін для проведення заходів РХБ захисту (годин)",
     min_value=0.5,
     max_value=24.0,
     value=2.0,
@@ -157,13 +157,13 @@ decontam_units_required = math.ceil(total_decontam_hours / time_limit)
 # ==========================================
 # ВІДОБРАЖЕННЯ РЕЗУЛЬТАТІВ
 # ==========================================
-st.markdown("## 📊 Результати розрахунку сил і засобів")
+st.markdown("Результати розрахунку необхідних сил і засобів РХБ захисту")
 
 m_col1, m_col2, m_col3 = st.columns(3)
 
 with m_col1:
     st.metric(
-        label="Дозори РХР (обслуги)",
+        label="Відділень РХР",
         value=f"{rhr_units_required} од.",
         delta=f"Обсяг: {rhr_val} "
         + ("км" if rhr_type == "Маршрут (км)" else "км²"),
@@ -171,16 +171,16 @@ with m_col1:
 
 with m_col2:
     st.metric(
-        label="Розрахунки сан. обробки (ДДА/АРС)",
+        label="Відділень сан. обробки",
         value=f"{san_units_required} од.",
-        delta=f"Особовий склад: {personnel_count} осіб",
+        delta=f"людей: {personnel_count}",
     )
 
 with m_col3:
     st.metric(
-        label="Пости / станції спец. обробки",
+        label="Відділень спец. обробки",
         value=f"{decontam_units_required} од.",
-        delta=f"Загалом техніки: {light_vehicles + heavy_vehicles} од.",
+        delta=f"Всього техніки: {light_vehicles + heavy_vehicles} од.",
     )
 
 st.markdown("---")
@@ -189,18 +189,18 @@ st.markdown("---")
 col_chart, col_summary = st.columns([1.2, 1])
 
 with col_chart:
-    st.markdown("### 📈 Необхідна кількість підрозділів")
+    st.markdown("Необхідна кількість підрозділів")
 
     categories = [
-        "Дозори РХР",
-        "Обслуги сан. обробки",
-        "Пости спец. обробки техніки",
+        "Відділення РХР",
+        "Відділення сан. обробки",
+        "Відділення спец. обробки техніки",
     ]
     values = [rhr_units_required, san_units_required, decontam_units_required]
 
     fig, ax = plt.subplots(figsize=(6, 3.5))
     bars = ax.barh(categories, values, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
-    ax.set_xlabel("Кількість підрозділів / розрахунків (од)")
+    ax.set_xlabel("Кількість підрозділів / відділень (од)")
     ax.set_xlim(0, max(values + [5]) + 2)
 
     # Додавання значень на бари
@@ -219,7 +219,7 @@ with col_chart:
     st.pyplot(fig)
 
 with col_summary:
-    st.markdown("### 📝 Деталізація та звіт")
+    st.markdown("Деталізація та звіт")
 
     report_data = {
         "Категорія": [
@@ -230,7 +230,7 @@ with col_summary:
         "Обсяг завдань": [
             f"{rhr_val} " + ("км" if rhr_type == "Маршрут (км)" else "км²"),
             f"{personnel_count} осіб",
-            f"{light_vehicles} легких, {heavy_vehicles} важких",
+            f"{light_vehicles} легкових, {heavy_vehicles} вантажних",
         ],
         "Нормативна спроможність на 1 од.": [
             (
@@ -239,7 +239,7 @@ with col_summary:
                 else f"{rhr_speed_area} км²/год"
             ),
             f"{san_capacity_per_unit} осіб/год",
-            f"{decontam_light_time} хв / {decontam_heavy_time} хв",
+            f"{decontam_light_time} год/ {decontam_heavy_time} год",
         ],
         "Загальна трудомісткість": [
             f"{rhr_val / (rhr_speed_route if rhr_type == 'Маршрут (км)' else rhr_speed_area):.1f} маш.-год",
