@@ -10,50 +10,37 @@ st.set_page_config(
     page_title="Розрахунок сил та засобів РХБ захисту",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded",
 )
 
-# 1. Повне жорстке приховування службової шапки та іконок Streamlit Cloud
+# Повне приховування службових іконок Streamlit Cloud та фіксація стилів
 st.markdown(
     """
     <style>
-    /* Повністю видаляємо верхню системну панель з іконками */
-    header, [data-testid="stHeader"], #MainMenu, footer, .stDecoration {
+    /* Приховуємо службову шапку та меню */
+    header, [data-testid="stHeader"], #MainMenu, footer {
         display: none !important;
         height: 0px !important;
         visibility: hidden !important;
     }
 
     /* Фіксуємо темну тему та білий колір тексту */
-    .stApp, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+    .stApp {
         background-color: #0E1117 !important;
         color: #FFFFFF !important;
     }
 
     h1, h2, h3, h4, h5, h6,
-    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
     label, p, span, div, .stMarkdown {
         color: #FFFFFF !important;
     }
-
-    /* Відновлюємо вертикальну лінію бічної панелі на ПК */
-    [data-testid="stSidebar"] {
-        border-right: 1px solid #30363D !important;
-    }
     
-    /* Відступ зверху, щоб вміст не налізав на край екрана */
+    /* Відступ зверху */
     .block-container {
         padding-top: 1.5rem !important;
     }
     </style>
 """,
     unsafe_allow_html=True,
-)
-
-# 2. Кнопка-перемикач для надійного відкривання/закривання панелі на смартфонах і ПК
-show_sidebar = st.toggle(
-    "⚙️ Налаштування можливостей підрозділів (бічна панель)", value=True
 )
 
 st.title("Розрахунок сил та засобів РХБЗ")
@@ -63,14 +50,13 @@ st.markdown("""
 """)
 
 # ==========================================
-# БІЧНА ПАНЕЛЬ: НАЛАШТУВАННЯ НОРМАТИВІВ
+# БЛОК НАЛАШТУВАННЯ НОРМАТИВІВ (В ОСНОВНІЙ ПАНЕЛІ)
 # ==========================================
-if show_sidebar:
-    st.sidebar.header("МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБ ЗАХИСТУ")
-
-    with st.sidebar.expander(
-        "Можливості відділення РХ розвідки (1 СМРХР):", expanded=False
-    ):
+with st.expander("⚙️ МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБ ЗАХИСТУ (НАЛАШТУВАННЯ НОРМАТИВІВ)", expanded=False):
+    cap_col1, cap_col2, cap_col3 = st.columns(3)
+    
+    with cap_col1:
+        st.markdown("#### 1. Відділення РХ розвідки (1 СМРХР)")
         rhr_speed_route = st.number_input(
             "РХ розвідка маршруту (км/год)",
             min_value=1.0,
@@ -86,10 +72,8 @@ if show_sidebar:
             step=0.5,
         )
 
-    with st.sidebar.expander(
-        "Можливості відділення санітарної обробки (1 комплект для сан. обробки)",
-        expanded=False,
-    ):
+    with cap_col2:
+        st.markdown("#### 2. Відділення санітарної обробки")
         san_capacity_per_unit = st.number_input(
             "Санітарна обробка людей (люд/год)",
             min_value=5,
@@ -98,9 +82,8 @@ if show_sidebar:
             step=5,
         )
 
-    with st.sidebar.expander(
-        "Можливості відділення спец. обробки техніки (1 СМРХЗ)", expanded=False
-    ):
+    with cap_col3:
+        st.markdown("#### 3. Відділення спец. обробки (1 СМРХЗ)")
         decontam_light_time = st.number_input(
             "Обробка легкових автомобілів (од/год)",
             min_value=5,
@@ -109,20 +92,14 @@ if show_sidebar:
             step=5,
         )
         decontam_heavy_time = st.number_input(
-            "Обробка вантажших та спец. автомобілів (од/год)",
+            "Обробка вантажних та спец. автомобілів (од/год)",
             min_value=10,
             max_value=180,
             value=40,
             step=5,
         )
-else:
-    # Значення за замовчуванням, якщо панель прихована
-    rhr_speed_route = 15.0
-    rhr_speed_area = 3.0
-    san_capacity_per_unit = 40
-    decontam_light_time = 20
-    decontam_heavy_time = 40
 
+st.markdown("---")
 
 # ==========================================
 # ОСНОВНА ПАНЕЛЬ: ВХІДНІ ДАНІ ДЛЯ ЗАВДАННЯ
