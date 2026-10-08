@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# Повне приховування службових іконок Streamlit Cloud та фіксація стилів
+# Повне приховування службових іконок Streamlit Cloud та стилізація
 st.markdown(
     """
     <style>
@@ -84,20 +84,24 @@ with st.expander("⚙️ МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБ ЗА
 
     with cap_col3:
         st.markdown("#### 3. Відділення спец. обробки (1 СМРХЗ)")
-        decontam_light_time = st.number_input(
-            "Обробка легкових автомобілів (од/год)",
-            min_value=5,
-            max_value=120,
+        decontam_degas_rate = st.number_input(
+            "Дегазація / Дезінфекція (легкових авт./год)",
+            min_value=1,
+            max_value=60,
             value=20,
-            step=5,
+            step=1,
+            help="Норма для легкового авто (нанесення розчину розпилювачем)",
         )
-        decontam_heavy_time = st.number_input(
-            "Обробка вантажних та спец. автомобілів (од/год)",
-            min_value=10,
-            max_value=180,
-            value=40,
-            step=5,
+        decontam_deact_rate = st.number_input(
+            "Дезактивація (легкових авт./год)",
+            min_value=1,
+            max_value=60,
+            value=10,
+            step=1,
+            help="Норма для легкового авто (змивання під тиском зі щітками)",
         )
+
+    st.info("💡 **Примітка щодо розрахунку техніки:** Прийнято оперативно-тактичне допущення, що 1 вантажний автомобіль або 1 автобус за обсягом робіт дорівнює 2 легковим автомобілям.")
 
 st.markdown("---")
 
@@ -136,14 +140,18 @@ with col2:
 
 with col3:
     st.markdown("### Спеціальна обробка техніки")
+    decontam_type = st.radio(
+        "Вид спеціальної обробки:",
+        ["Дегазація (дезінфекція)", "Дезактивація"],
+    )
     light_vehicles = st.number_input(
         "Легкові автомобілі (од)",
         min_value=0,
         value=15,
         step=1,
     )
-    heavy_vehicles = st.number_input(
-        "Вантажні та спец. автомобілі (од)",
+    heavy_and_buses = st.number_input(
+        "Вантажні автомобілі та автобуси (од)",
         min_value=0,
         value=8,
         step=1,
@@ -180,11 +188,20 @@ san_units_required = (
     math.ceil(personnel_count / capacity_san) if capacity_san > 0 else 0
 )
 
-# 3. Спеціальна обробка техніки
-total_decontam_hours = (light_vehicles * (decontam_light_time / 60.0)) + (
-    heavy_vehicles * (decontam_heavy_time / 60.0)
+# 3. Спеціальна обробка техніки (Зведення до умовних легкових авто: 1 вантажне/автобус = 2 легкових)
+equiv_light_vehicles = light_vehicles + (heavy_and_buses * 2)
+
+if decontam_type == "Дегазація (дезінфекція)":
+    current_decontam_rate = decontam_degas_rate
+else:
+    current_decontam_rate = decontam_deact_rate
+
+capacity_decontam_per_unit = current_decontam_rate * time_limit
+decontam_units_required = (
+    math.ceil(equiv_light_vehicles / capacity_decontam_per_unit)
+    if capacity_decontam_per_unit > 0
+    else 0
 )
-decontam_units_required = math.ceil(total_decontam_hours / time_limit)
 
 
 # ==========================================
@@ -211,9 +228,9 @@ with m_col2:
 
 with m_col3:
     st.metric(
-        label="Відділень спец. обробки",
+        label=f"Відділень спец. обробки ({decontam_type})",
         value=f"{decontam_units_required}",
-        delta=f"Всього техніки: {light_vehicles + heavy_vehicles} од.",
+        delta=f"Всього техніки: {light_vehicles + heavy_and_buses} од. ({equiv_light_vehicles} умов. од.)",
     )
 
 st.markdown("---")
@@ -260,12 +277,12 @@ with col_summary:
         "Категорія": [
             "Розвідка (РХР)",
             "Санітарна обробка",
-            "Дегазація/Дезактивація техніки",
+            f"Спец. обробка ({decontam_type})",
         ],
         "Обсяг завдань": [
             f"{rhr_val} " + ("км" if rhr_type == "Маршрут (км)" else "км²"),
             f"{personnel_count} осіб",
-            f"{light_vehicles} легкових, {heavy_vehicles} вантажних",
+            f"{light_vehicles} легкових, {heavy_and_buses} вантажних/автобусів ({equiv_light_vehicles} умов. од.)",
         ],
         "Термін виконання": [
             f"{time_limit} год",
@@ -279,7 +296,7 @@ with col_summary:
                 else f"{rhr_speed_area} км²/год"
             ),
             f"{san_capacity_per_unit} осіб/год",
-            f"{decontam_light_time} од/год / {decontam_heavy_time} од/год",
+            f"{current_decontam_rate} умов. од./год",
         ],
         "Необхідна кількість відділень": [
             f"{rhr_units_required}",
@@ -290,6 +307,8 @@ with col_summary:
 
     df_report = pd.DataFrame(report_data)
     st.dataframe(df_report, hide_index=True, use_container_width=True)
+
+    st.caption("Примітка: 1 вантажний автомобіль або 1 автобус прирівнюється до 2 умовних легкових автомобілів.")
 
     # Експорт у CSV
     csv_buffer = io.StringIO()
