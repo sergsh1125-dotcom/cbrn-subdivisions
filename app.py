@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-# Налаштування сторінки: панель відкрита за замовчуванням на всіх пристроях
+# Налаштування сторінки
 st.set_page_config(
     page_title="Розрахунок сил та засобів РХБ захисту",
     page_icon="🛡️",
@@ -13,15 +13,18 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Чистий базовий CSS (без блокування нативних кнопок Streamlit)
+# 1. Повне жорстке приховування службової шапки та іконок Streamlit Cloud
 st.markdown(
     """
     <style>
-    /* Приховуємо лише верхні службові меню Streamlit (Deploy, Share) */
-    #MainMenu {visibility: hidden !important;}
-    footer {visibility: hidden !important;}
+    /* Повністю видаляємо верхню системну панель з іконками */
+    header, [data-testid="stHeader"], #MainMenu, footer, .stDecoration {
+        display: none !important;
+        height: 0px !important;
+        visibility: hidden !important;
+    }
 
-    /* Фіксуємо темну тему та білий колір для всього тексту */
+    /* Фіксуємо темну тему та білий колір тексту */
     .stApp, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
         background-color: #0E1117 !important;
         color: #FFFFFF !important;
@@ -34,13 +37,23 @@ st.markdown(
         color: #FFFFFF !important;
     }
 
-    /* Відновлюємо вертикальну розділювальну лінію бічної панелі на ПК */
+    /* Відновлюємо вертикальну лінію бічної панелі на ПК */
     [data-testid="stSidebar"] {
         border-right: 1px solid #30363D !important;
+    }
+    
+    /* Відступ зверху, щоб вміст не налізав на край екрана */
+    .block-container {
+        padding-top: 1.5rem !important;
     }
     </style>
 """,
     unsafe_allow_html=True,
+)
+
+# 2. Кнопка-перемикач для надійного відкривання/закривання панелі на смартфонах і ПК
+show_sidebar = st.toggle(
+    "⚙️ Налаштування можливостей підрозділів (бічна панель)", value=True
 )
 
 st.title("Розрахунок сил та засобів РХБЗ")
@@ -52,55 +65,63 @@ st.markdown("""
 # ==========================================
 # БІЧНА ПАНЕЛЬ: НАЛАШТУВАННЯ НОРМАТИВІВ
 # ==========================================
-st.sidebar.header("МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБ ЗАХИСТУ")
+if show_sidebar:
+    st.sidebar.header("МОЖЛИВОСТІ ПІДРОЗДІЛІВ РХБ ЗАХИСТУ")
 
-with st.sidebar.expander(
-    "Можливості відділення РХ розвідки (1 СМРХР):", expanded=False
-):
-    rhr_speed_route = st.number_input(
-        "РХ розвідка маршруту (км/год)",
-        min_value=1.0,
-        max_value=50.0,
-        value=15.0,
-        step=1.0,
-    )
-    rhr_speed_area = st.number_input(
-        "РХ розвідка району (км²/год)",
-        min_value=0.5,
-        max_value=20.0,
-        value=3.0,
-        step=0.5,
-    )
+    with st.sidebar.expander(
+        "Можливості відділення РХ розвідки (1 СМРХР):", expanded=False
+    ):
+        rhr_speed_route = st.number_input(
+            "РХ розвідка маршруту (км/год)",
+            min_value=1.0,
+            max_value=50.0,
+            value=15.0,
+            step=1.0,
+        )
+        rhr_speed_area = st.number_input(
+            "РХ розвідка району (км²/год)",
+            min_value=0.5,
+            max_value=20.0,
+            value=3.0,
+            step=0.5,
+        )
 
-with st.sidebar.expander(
-    "Можливості відділення санітарної обробки (1 комплект для сан. обробки)",
-    expanded=False,
-):
-    san_capacity_per_unit = st.number_input(
-        "Санітарна обробка людей (люд/год)",
-        min_value=5,
-        max_value=200,
-        value=40,
-        step=5,
-    )
+    with st.sidebar.expander(
+        "Можливості відділення санітарної обробки (1 комплект для сан. обробки)",
+        expanded=False,
+    ):
+        san_capacity_per_unit = st.number_input(
+            "Санітарна обробка людей (люд/год)",
+            min_value=5,
+            max_value=200,
+            value=40,
+            step=5,
+        )
 
-with st.sidebar.expander(
-    "Можливості відділення спец. обробки техніки (1 СМРХЗ)", expanded=False
-):
-    decontam_light_time = st.number_input(
-        "Обробка легкових автомобілів (од/год)",
-        min_value=5,
-        max_value=120,
-        value=20,
-        step=5,
-    )
-    decontam_heavy_time = st.number_input(
-        "Обробка вантажших та спец. автомобілів (од/год)",
-        min_value=10,
-        max_value=180,
-        value=40,
-        step=5,
-    )
+    with st.sidebar.expander(
+        "Можливості відділення спец. обробки техніки (1 СМРХЗ)", expanded=False
+    ):
+        decontam_light_time = st.number_input(
+            "Обробка легкових автомобілів (од/год)",
+            min_value=5,
+            max_value=120,
+            value=20,
+            step=5,
+        )
+        decontam_heavy_time = st.number_input(
+            "Обробка вантажших та спец. автомобілів (од/год)",
+            min_value=10,
+            max_value=180,
+            value=40,
+            step=5,
+        )
+else:
+    # Значення за замовчуванням, якщо панель прихована
+    rhr_speed_route = 15.0
+    rhr_speed_area = 3.0
+    san_capacity_per_unit = 40
+    decontam_light_time = 20
+    decontam_heavy_time = 40
 
 
 # ==========================================
