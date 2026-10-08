@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-# Налаштування сторінки
+# Налаштування сторінки: панель відкрита за замовчуванням на всіх пристроях
 st.set_page_config(
     page_title="Розрахунок сил та засобів РХБ захисту",
     page_icon="🛡️",
@@ -13,20 +13,15 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS
+# Чистий базовий CSS (без блокування нативних кнопок Streamlit)
 st.markdown(
     """
     <style>
-    /* 1. Повністю приховуємо верхню службову панель, іконки Fork, Share, Меню */
-    [data-testid="stHeader"] {
-        display: none !important;
-    }
-    #MainMenu, footer, header {
-        visibility: hidden !important;
-        height: 0px !important;
-    }
+    /* Приховуємо лише верхні службові меню Streamlit (Deploy, Share) */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
 
-    /* 2. Фіксуємо темну тему та БІЛИЙ колір для всіх заголовків і тексту */
+    /* Фіксуємо темну тему та білий колір для всього тексту */
     .stApp, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
         background-color: #0E1117 !important;
         color: #FFFFFF !important;
@@ -39,38 +34,9 @@ st.markdown(
         color: #FFFFFF !important;
     }
 
-    /* 3. Відновлюємо вертикальну розділювальну лінію бічної панелі на ПК */
+    /* Відновлюємо вертикальну розділювальну лінію бічної панелі на ПК */
     [data-testid="stSidebar"] {
         border-right: 1px solid #30363D !important;
-    }
-
-    /* 4. ЧІТКА ВІДИМА КНОПКА ВІДКРИВАННЯ ПАНЕЛІ (для смартфона та ПК) */
-    /* Фіксуємо її у верхньому лівому кутку, щоб вона ніколи не зникала */
-    [data-testid="stSidebarCollapsedControl"],
-    button[aria-label="Open sidebar"],
-    button[aria-label="Close sidebar"] {
-        position: fixed !important;
-        top: 10px !important;
-        left: 10px !important;
-        z-index: 999999 !important;
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        background-color: #FFFFFF !important;
-        border: 1px solid #CCCCCC !important;
-        border-radius: 6px !important;
-        padding: 4px !important;
-        box-shadow: 0px 2px 8px rgba(0,0,0,0.5) !important;
-    }
-
-    /* Іконка всередині кнопки (темна для контрасту на білому фоні) */
-    [data-testid="stSidebarCollapsedControl"] svg,
-    button[aria-label="Open sidebar"] svg,
-    button[aria-label="Close sidebar"] svg {
-        color: #0E1117 !important;
-        fill: #0E1117 !important;
-        width: 24px !important;
-        height: 24px !important;
     }
     </style>
 """,
